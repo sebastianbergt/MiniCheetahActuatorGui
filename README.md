@@ -19,7 +19,7 @@ conan create packages/can_interface_lib/ -b missing
 :stop_sign: Project is not usable yet
 
 ## Todos
-* Complete the library driver
+* Complete the socket can library
 * Create imgui application
 
 ## Similar Projects and information
