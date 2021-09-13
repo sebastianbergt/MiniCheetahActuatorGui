@@ -5,6 +5,7 @@ Create a fully tested C++14 driver lib and imgui GUI to be used with [TMotor AK6
 
 ## Build instructions
 The project is utilizing the excellent [conan package manager](https://conan.io/) and [cmake](https://cmake.org/).
+
 [Trompeloeil](https://github.com/rollbear/trompeloeil/) is used for mocking and [Catch2](https://github.com/catchorg/Catch2) for unit tests.
 
 Currently you need to build the packages individually.
