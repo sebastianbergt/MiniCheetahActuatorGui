@@ -12,8 +12,8 @@ namespace can_interface_lib
     public:
         bool connect(const std::string &interface_name) override;
         bool disconnect() override;
-        bool send(const IFrame &can_frame) override;
-        bool receive(IFrame &can_frame) override;
+        bool send(const CanFrame &can_frame) override;
+        bool receive(CanFrame &can_frame) override;
 
     private:
         std::int32_t socket_{};

@@ -4,21 +4,23 @@
 #include <array>
 #include <cstdint>
 
-#include <can_interface_lib/i_frame.h>
+#include <strong_types_lib/strong_types.h>
 
 namespace can_interface_lib
 {
-    class CanFrame : public IFrame
+    using CanId = strong_types::StrongType<std::uint8_t, struct CanIdTag>;
+
+    constexpr std::size_t CAN_DATA_FRAME_SIZE{8U};
+    using CanData = std::array<std::uint8_t, CAN_DATA_FRAME_SIZE>;
+
+    using CanBytesUsed = strong_types::StrongType<std::uint8_t, struct CanBytesUsedTag>;
+
+    class CanFrame
     {
     public:
-        void set(const CanData &data) override;
-        CanData &getData() override;
-        void set(const CanId &can_id) override;
-        CanId getId() override;
-
-    private:
-        CanId id_{0x00};
-        std::array<std::uint8_t, 8> data_{};
+        CanId id{0x00};
+        CanData data{};
+        CanBytesUsed bytes_used{CAN_DATA_FRAME_SIZE};
     };
 
 } // namespace strong_types

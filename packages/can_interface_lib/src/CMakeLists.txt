@@ -12,14 +12,9 @@ conan_basic_setup()
 # lib
 add_library(
   can_interface_lib
-  include/can_interface_lib/can.h
-  include/can_interface_lib/i_can.h
-  include/can_interface_lib/i_frame.h
-  include/can_interface_lib/can_frame.h
-  include/can_interface_lib/socket_can.h
-  src/can.cpp
-  src/can_frame.cpp
-  src/socket_can.cpp)
+  include/can_interface_lib/can.h include/can_interface_lib/i_can.h
+  include/can_interface_lib/can_frame.h include/can_interface_lib/socket_can.h
+  src/can.cpp src/socket_can.cpp)
 target_include_directories(can_interface_lib PUBLIC include)
 
 find_package(strong_types_lib REQUIRED)

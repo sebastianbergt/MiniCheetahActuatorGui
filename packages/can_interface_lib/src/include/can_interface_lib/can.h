@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 #include <can_interface_lib/i_can.h>
-#include <can_interface_lib/i_frame.h>
 #include <can_interface_lib/can_frame.h>
 
 namespace can_interface_lib
