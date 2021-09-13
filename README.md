@@ -9,8 +9,10 @@ The project is utilizing the excellent [conan package manager](https://conan.io/
 
 Currently you need to build the packages individually.
 
-'conan create packages/strong_types_lib/ -b missing'
-'conan create packages/can_interface_lib/ -b missing'
+```
+conan create packages/strong_types_lib/ -b missing
+conan create packages/can_interface_lib/ -b missing
+```
 
 # Status
 :stop_sign: Project is not usable yet
