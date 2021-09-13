@@ -1,6 +1,5 @@
 #include <string>
 #include <cstring>
-#include <can_interface_lib/i_can.h>
 #include <can_interface_lib/socket_can.h>
 
 #include <unistd.h>     // close
@@ -22,10 +21,14 @@ namespace can_interface_lib
         // get interface
         ifreq interface_index{};
         strcpy(interface_index.ifr_name, interface_name.c_str());
-        ioctl(socket_, SIOCGIFINDEX, &interface_index);
+        auto result = ioctl(socket_, SIOCGIFINDEX, &interface_index);
+        if (result < 0)
+        {
+            return false;
+        }
         // bind socket
         const sockaddr_can socketcan_config{.can_family = AF_CAN, .can_ifindex = interface_index.ifr_ifindex};
-        std::int32_t result = bind(socket_, reinterpret_cast<const sockaddr *>(&socketcan_config), sizeof(socketcan_config));
+        result = bind(socket_, reinterpret_cast<const sockaddr *>(&socketcan_config), sizeof(socketcan_config));
         if (result < 0)
         {
             return false;
@@ -37,12 +40,13 @@ namespace can_interface_lib
 
     bool SocketCan::disconnect()
     {
-        if (connected_)
+        if (!connected_)
         {
-            if (close(socket_) < 0)
-            {
-                return false;
-            }
+            return false;
+        }
+        if (close(socket_) < 0)
+        {
+            return false;
         }
         return true;
     }

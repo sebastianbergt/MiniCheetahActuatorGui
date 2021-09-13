@@ -2,7 +2,7 @@
 #define CAN_INTERFACE_LIB_CAN_FRAME_H
 
 #include <array>
-#include <inttypes>
+#include <cstdint>
 
 #include <can_interface_lib/i_frame.h>
 
@@ -10,10 +10,16 @@ namespace can_interface_lib
 {
     class CanFrame : public IFrame
     {
+    public:
+        void set(const CanData &data) override;
+        CanData &getData() override;
+        void set(const CanId &can_id) override;
+        CanId getId() override;
+
     private:
-        std::uint32_t id{};
-        std::array<std::uint8_t, 8> data{};
-    }
+        CanId id_{0x00};
+        std::array<std::uint8_t, 8> data_{};
+    };
 
 } // namespace strong_types
 

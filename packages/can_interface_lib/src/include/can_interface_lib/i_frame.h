@@ -14,10 +14,10 @@ namespace can_interface_lib
 
     class IFrame
     {
-        virtual void setData(const CanData &data);
-        virtual CanData &getData();
-        virtual void setId(CanId can_id);
-        virtual CanId getId();
+        virtual void set(const CanData &data) = 0;
+        virtual CanData &getData() = 0;
+        virtual void set(const CanId &can_id) = 0;
+        virtual CanId getId() = 0;
     };
 
 } // namespace can_interface_lib

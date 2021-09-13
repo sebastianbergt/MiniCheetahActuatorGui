@@ -2,6 +2,7 @@
 #define CAN_INTERFACE_LIB_SOCKET_CAN_H
 
 #include <string>
+#include <memory>
 #include <can_interface_lib/i_can.h>
 
 namespace can_interface_lib

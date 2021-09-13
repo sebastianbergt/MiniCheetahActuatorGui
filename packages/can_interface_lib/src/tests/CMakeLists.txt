@@ -1,4 +1,4 @@
-add_executable(socket_can_test socket_can_test.cpp) # i_can_test.cpp
+add_executable(socket_can_test can_test.cpp i_can_test.cpp)
 
 target_link_libraries(
   socket_can_test PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil
