@@ -1,7 +1,7 @@
 # MiniCheetahActuatorGui
 
 ## Project Goal
-Create a fully tested C++ driver lib and imgui GUI
+Create a fully tested C++14 driver lib and imgui GUI to be used with [TMotor AK60-6 and other motors using the same driver](https://store.tmotor.com/goods.php?id=1138).
 
 ## Build instructions
 The project is utilizing the excellent [conan package manager](https://conan.io/) and [cmake](https://cmake.org/).
