@@ -4,3 +4,10 @@ target_link_libraries(
   socket_can_test PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil
                           can_interface_lib)
 add_test(NAME socket_can_test COMMAND socket_can_test)
+
+# test somethin
+add_executable(socket_runner runner.cpp)
+
+target_link_libraries(socket_runner PRIVATE can_interface_lib)
+
+add_test(NAME socket_runner COMMAND socket_runner)

@@ -5,11 +5,13 @@
 
 #include "mock_linux_socket.h"
 #include "mock_linux_ioctl.h"
+#include "mock_linux_ifaddrs.h"
 
 #include <can_interface_lib/can.h>
 
 MockLinuxSocket c_mock_linux_socket;
 MockLinuxIoctl c_mock_linux_ioctl;
+MockLinuxIfaddrs c_mock_linux_ifaddrs;
 
 extern "C"
 {
@@ -46,6 +48,16 @@ extern "C"
         va_end(var_arg_list);
         return c_mock_linux_ioctl.ioctl(fd, request, interface_index_pointer);
     }
+
+    // int getifaddrs(ifaddrs *if_adr)
+    // {
+    //     return c_mock_linux_ifaddrs.getifaddrs(if_adr);
+    // }
+
+    // void freeifaddrs(ifaddrs *if_adr)
+    // {
+    //     return c_mock_linux_ifaddrs.freeifaddrs(if_adr);
+    // }
 };
 
 using trompeloeil::_;
@@ -54,6 +66,58 @@ constexpr int MOCK_SOCKET{1};
 constexpr int MOCK_CAN_INTERFACE_INDEX{0};
 constexpr int RESULT_SUCCESS{0};
 constexpr int RESULT_FAILURE{-1};
+
+SCENARIO("Sunny day: Query can interfaces")
+{
+    // GIVEN("a linked list of interfaces")
+    // {
+    // ifaddr test_list{};
+    // sockaddr test_socket{};
+    // test_socket.sa_family == AF_CAN;
+    // char *test_interface_name = "can0";
+    // test_list.ifa_addr = &test_socket;
+    // test_list.ifa_name = test_interface_name;
+    WHEN("querying can interface names")
+    {
+        // REQUIRE_CALL(c_mock_linux_ifaddrs, getifaddrs(_).LR_SIDE_EFFECT(_1 = &test_list).RETURN(RESULT_SUCCESS));
+        // REQUIRE_CALL(c_mock_linux_ifaddrs, freeifaddrs(_));
+
+        const auto can_interfaces = can_interface_lib::getCanInterfaceNames();
+        THEN("it succeeds")
+        {
+            CHECK(can_interfaces.size() > 0);
+            //     CHECK(can_interfaces.front().compare("can0") == 0U);
+            // }
+        }
+    }
+}
+// }
+
+// SCENARIO("Rainy day: getifaddrs fails")
+// {
+//     WHEN("querying can interface names")
+//     {
+//         REQUIRE_CALL(c_mock_linux_ifaddrs, getifaddrs(_).RETURN(RESULT_FAILURE));
+
+//         const auto can_interfaces = can_interface_lib::getCanInterfaceNames();
+//         THEN("no interface is found")
+//         {
+//             CHECK(can_interfaces.size() == 0);
+//         }
+//     }
+// }
+
+// SCENARIO("Rainy day: Query can interfaces but none found")
+// {
+//     WHEN("querying can interface names")
+//     {
+//         const auto can_interfaces = can_interface_lib::getCanInterfaceNames();
+//         THEN("none is found")
+//         {
+//             CHECK(can_interfaces.size() == 0L);
+//         }
+//     }
+// }
 
 SCENARIO("Sunny day: whole life cycle")
 {
@@ -82,24 +146,33 @@ SCENARIO("Sunny day: whole life cycle")
                     {
                         CHECK(send_success);
 
-                        AND_WHEN("receive is called")
+                        AND_WHEN("filter is called")
                         {
-                            REQUIRE_CALL(c_mock_linux_socket, read(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
-
-                            auto can_frame = can_interface_lib::makeCanFrame();
-                            const auto receive_success = can->receive(can_frame);
-                            THEN("receive succeeded")
+                            const auto success = can->filter(can_interface_lib::CanId{0x100}, can_interface_lib::CanMask{0x110});
+                            THEN("filter fails")
                             {
-                                CHECK(receive_success);
+                                CHECK(success);
 
-                                AND_WHEN("disconnect is called")
+                                AND_WHEN("receive is called")
                                 {
-                                    REQUIRE_CALL(c_mock_linux_socket, close(eq(MOCK_SOCKET))).RETURN(RESULT_SUCCESS);
+                                    REQUIRE_CALL(c_mock_linux_socket, read(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
 
-                                    const auto disconnect_success = can->disconnect();
-                                    THEN("disconnect succeeded")
+                                    auto can_frame = can_interface_lib::makeCanFrame();
+                                    const auto receive_success = can->receive(can_frame);
+                                    THEN("receive succeeded")
                                     {
-                                        CHECK(disconnect_success);
+                                        CHECK(receive_success);
+
+                                        AND_WHEN("disconnect is called")
+                                        {
+                                            REQUIRE_CALL(c_mock_linux_socket, close(eq(MOCK_SOCKET))).RETURN(RESULT_SUCCESS);
+
+                                            const auto disconnect_success = can->disconnect();
+                                            THEN("disconnect succeeded")
+                                            {
+                                                CHECK(disconnect_success);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -142,6 +215,14 @@ SCENARIO("Rainy day: Not connected first")
             auto can_frame = can_interface_lib::makeCanFrame();
             const auto success = can->receive(can_frame);
             THEN("receive fails")
+            {
+                CHECK_FALSE(success);
+            }
+        }
+        WHEN("filter is called before being connected")
+        {
+            const auto success = can->filter(can_interface_lib::CanId{0x100}, can_interface_lib::CanMask{0x110});
+            THEN("filter fails")
             {
                 CHECK_FALSE(success);
             }

@@ -13,6 +13,7 @@ namespace can_interface_lib
         virtual bool connect(const std::string &interface_name) = 0;
         virtual bool disconnect() = 0;
         virtual bool send(const CanFrame &can_frame) = 0;
+        virtual bool filter(CanId can_id, CanMask can_mask) = 0;
         virtual bool receive(CanFrame &can_frame) = 0;
     };
 
