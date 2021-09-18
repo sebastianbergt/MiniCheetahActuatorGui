@@ -15,6 +15,18 @@ conan create packages/strong_types_lib/ -b missing
 conan create packages/can_interface_lib/ -b missing
 ```
 
+# Checking coverage
+Install gcovr through pip3
+
+```
+pip3 install gcovr
+```
+
+You should then be able to run the build with the coverage profile. Watch the output for a link to coverage.html
+```
+conan create packages/can_interface_lib/ -b -pr ./conan/profiles/coverage
+```
+
 # Status
 :stop_sign: Project is not usable yet
 
