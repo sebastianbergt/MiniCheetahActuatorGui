@@ -4,11 +4,12 @@
 #include <iterator>
 #include <algorithm>
 
-#include <unistd.h>     // close
-#include <sys/socket.h> // socket, bind
-#include <net/if.h>     // ifreq
-#include <sys/ioctl.h>  // ioctl
-#include <linux/can.h>  // sockaddr_can
+#include <unistd.h>        // close
+#include <sys/socket.h>    // socket, bind
+#include <net/if.h>        // ifreq
+#include <sys/ioctl.h>     // ioctl
+#include <linux/can.h>     // sockaddr_can
+#include <linux/can/raw.h> // SOL_CAN_RAW, CAN_RAW_FILTER
 
 namespace can_interface_lib
 {
@@ -71,6 +72,21 @@ namespace can_interface_lib
             return false;
         }
 
+        return true;
+    }
+
+    bool SocketCan::filter(CanId can_id, CanMask can_mask)
+    {
+        if (!connected_)
+        {
+            return false;
+        }
+
+        can_filter rfilter[1];
+        rfilter[0].can_id = can_id.get();
+        rfilter[0].can_mask = can_mask.get();
+
+        setsockopt(socket_, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
         return true;
     }
 

@@ -31,7 +31,8 @@ conan create packages/can_interface_lib/ -b -pr ./conan/profiles/coverage
 :stop_sign: Project is not usable yet
 
 ## Todos
-* Complete the socket can library
+* Complete the socket can library -> done
+* Create the actuator lib
 * Create imgui application
 
 ## Similar Projects and information

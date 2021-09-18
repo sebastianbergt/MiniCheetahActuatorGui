@@ -82,24 +82,33 @@ SCENARIO("Sunny day: whole life cycle")
                     {
                         CHECK(send_success);
 
-                        AND_WHEN("receive is called")
+                        AND_WHEN("filter is called")
                         {
-                            REQUIRE_CALL(c_mock_linux_socket, read(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
-
-                            auto can_frame = can_interface_lib::makeCanFrame();
-                            const auto receive_success = can->receive(can_frame);
-                            THEN("receive succeeded")
+                            const auto success = can->filter(can_interface_lib::CanId{0x100}, can_interface_lib::CanMask{0x110});
+                            THEN("filter fails")
                             {
-                                CHECK(receive_success);
+                                CHECK(success);
 
-                                AND_WHEN("disconnect is called")
+                                AND_WHEN("receive is called")
                                 {
-                                    REQUIRE_CALL(c_mock_linux_socket, close(eq(MOCK_SOCKET))).RETURN(RESULT_SUCCESS);
+                                    REQUIRE_CALL(c_mock_linux_socket, read(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
 
-                                    const auto disconnect_success = can->disconnect();
-                                    THEN("disconnect succeeded")
+                                    auto can_frame = can_interface_lib::makeCanFrame();
+                                    const auto receive_success = can->receive(can_frame);
+                                    THEN("receive succeeded")
                                     {
-                                        CHECK(disconnect_success);
+                                        CHECK(receive_success);
+
+                                        AND_WHEN("disconnect is called")
+                                        {
+                                            REQUIRE_CALL(c_mock_linux_socket, close(eq(MOCK_SOCKET))).RETURN(RESULT_SUCCESS);
+
+                                            const auto disconnect_success = can->disconnect();
+                                            THEN("disconnect succeeded")
+                                            {
+                                                CHECK(disconnect_success);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -142,6 +151,14 @@ SCENARIO("Rainy day: Not connected first")
             auto can_frame = can_interface_lib::makeCanFrame();
             const auto success = can->receive(can_frame);
             THEN("receive fails")
+            {
+                CHECK_FALSE(success);
+            }
+        }
+        WHEN("filter is called before being connected")
+        {
+            const auto success = can->filter(can_interface_lib::CanId{0x100}, can_interface_lib::CanMask{0x110});
+            THEN("filter fails")
             {
                 CHECK_FALSE(success);
             }

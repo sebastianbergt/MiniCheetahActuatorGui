@@ -29,10 +29,12 @@ install(
   PATTERN "*.h*")
 
 # tests
-
 if(WITH_TESTS)
   include(CTest)
   find_package(Catch2 REQUIRED)
   find_package(trompeloeil REQUIRED)
   add_subdirectory(tests)
 endif()
+
+# build example
+add_subdirectory(example)
