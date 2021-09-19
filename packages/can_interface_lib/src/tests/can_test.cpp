@@ -57,56 +57,81 @@ constexpr int RESULT_FAILURE{-1};
 
 SCENARIO("Sunny day: whole life cycle")
 {
-
     GIVEN("A CAN object")
     {
         auto can = can_interface_lib::makeCanInterface();
 
-        WHEN("connect is called")
+        WHEN("isConnected is called without calling connect before")
         {
-            REQUIRE_CALL(c_mock_linux_socket, socket(eq(PF_CAN), eq(SOCK_RAW), eq(CAN_RAW))).RETURN(MOCK_SOCKET);
-            REQUIRE_CALL(c_mock_linux_ioctl, ioctl(eq(MOCK_SOCKET), eq(SIOCGIFINDEX), _)).LR_SIDE_EFFECT(_3->ifr_ifindex = MOCK_CAN_INTERFACE_INDEX).RETURN(RESULT_SUCCESS);
-            REQUIRE_CALL(c_mock_linux_socket, bind(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(RESULT_SUCCESS);
-
-            const auto connect_success = can->connect("can0");
-            THEN("connect succeeded")
+            auto is_connected = can->isConnected();
+            THEN("it is not connected")
             {
-                CHECK(connect_success);
-                AND_WHEN("send is called")
+                REQUIRE_FALSE(is_connected);
+                AND_WHEN("connect is called")
                 {
-                    REQUIRE_CALL(c_mock_linux_socket, write(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
+                    REQUIRE_CALL(c_mock_linux_socket, socket(eq(PF_CAN), eq(SOCK_RAW), eq(CAN_RAW))).RETURN(MOCK_SOCKET);
+                    REQUIRE_CALL(c_mock_linux_ioctl, ioctl(eq(MOCK_SOCKET), eq(SIOCGIFINDEX), _)).LR_SIDE_EFFECT(_3->ifr_ifindex = MOCK_CAN_INTERFACE_INDEX).RETURN(RESULT_SUCCESS);
+                    REQUIRE_CALL(c_mock_linux_socket, bind(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(RESULT_SUCCESS);
 
-                    const auto can_frame = can_interface_lib::makeCanFrame();
-                    const auto send_success = can->send(can_frame);
-                    THEN("send succeeded")
+                    const auto connect_success = can->connect("can0");
+                    THEN("connect succeeded")
                     {
-                        CHECK(send_success);
+                        REQUIRE(connect_success);
 
-                        AND_WHEN("filter is called")
+                        AND_WHEN("isConnected is called")
                         {
-                            const auto success = can->filter(can_interface_lib::CanId{0x100}, can_interface_lib::CanMask{0x110});
-                            THEN("filter fails")
+                            is_connected = can->isConnected();
+                            THEN("it is connected")
                             {
-                                CHECK(success);
+                                REQUIRE(is_connected);
 
-                                AND_WHEN("receive is called")
+                                AND_WHEN("send is called")
                                 {
-                                    REQUIRE_CALL(c_mock_linux_socket, read(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
+                                    REQUIRE_CALL(c_mock_linux_socket, write(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
 
-                                    auto can_frame = can_interface_lib::makeCanFrame();
-                                    const auto receive_success = can->receive(can_frame);
-                                    THEN("receive succeeded")
+                                    const auto can_frame = can_interface_lib::makeCanFrame();
+                                    const auto send_success = can->send(can_frame);
+                                    THEN("send succeeded")
                                     {
-                                        CHECK(receive_success);
+                                        REQUIRE(send_success);
 
-                                        AND_WHEN("disconnect is called")
+                                        AND_WHEN("filter is called")
                                         {
-                                            REQUIRE_CALL(c_mock_linux_socket, close(eq(MOCK_SOCKET))).RETURN(RESULT_SUCCESS);
-
-                                            const auto disconnect_success = can->disconnect();
-                                            THEN("disconnect succeeded")
+                                            const auto success = can->filter(can_interface_lib::CanId{0x100}, can_interface_lib::CanMask{0x110});
+                                            THEN("filter succeeds")
                                             {
-                                                CHECK(disconnect_success);
+                                                REQUIRE(success);
+
+                                                AND_WHEN("receive is called")
+                                                {
+                                                    REQUIRE_CALL(c_mock_linux_socket, read(eq(MOCK_SOCKET), _, sizeof(sockaddr_can))).RETURN(can_interface_lib::CAN_DATA_FRAME_SIZE);
+
+                                                    auto can_frame = can_interface_lib::makeCanFrame();
+                                                    const auto receive_success = can->receive(can_frame);
+                                                    THEN("receive succeeds")
+                                                    {
+                                                        REQUIRE(receive_success);
+
+                                                        AND_WHEN("disconnect is called")
+                                                        {
+                                                            REQUIRE_CALL(c_mock_linux_socket, close(eq(MOCK_SOCKET))).RETURN(RESULT_SUCCESS);
+
+                                                            const auto disconnect_success = can->disconnect();
+                                                            THEN("disconnect succeeded")
+                                                            {
+                                                                REQUIRE(disconnect_success);
+                                                                AND_WHEN("isConnected is called after disconnect")
+                                                                {
+                                                                    is_connected = can->isConnected();
+                                                                    THEN("it is not connected")
+                                                                    {
+                                                                        REQUIRE_FALSE(is_connected);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }

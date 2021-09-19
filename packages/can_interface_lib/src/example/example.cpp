@@ -13,7 +13,7 @@ int main()
     const auto sent_frame = cil::CanFrame{
         .id = cil::CanId(0x123),
         .data = cil::CanData{{0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x00, 0x00, 0x00}},
-        .bytes_used = cil::CanBytesUsed(4U)};
+        .bytes_used = cil::BytesUsed(4U)};
     can->send(sent_frame);
 
     can->filter(cil::CanId(0x123), cil::CanMask{0xFFF});

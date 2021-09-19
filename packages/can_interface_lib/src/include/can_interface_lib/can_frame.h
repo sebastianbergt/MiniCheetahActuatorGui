@@ -14,14 +14,14 @@ namespace can_interface_lib
     constexpr std::size_t CAN_DATA_FRAME_SIZE{8U};
     using CanData = std::array<std::uint8_t, CAN_DATA_FRAME_SIZE>;
 
-    using CanBytesUsed = strong_types::StrongType<std::uint8_t, struct CanBytesUsedTag>;
+    using BytesUsed = strong_types::StrongType<std::uint8_t, struct BytesUsedTag>;
 
     class CanFrame
     {
     public:
         CanId id{0x0000};
         CanData data{};
-        CanBytesUsed bytes_used{CAN_DATA_FRAME_SIZE};
+        BytesUsed bytes_used{CAN_DATA_FRAME_SIZE};
     };
 
 } // namespace strong_types

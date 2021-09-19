@@ -51,7 +51,13 @@ namespace can_interface_lib
         {
             return false;
         }
+        connected_ = false;
         return true;
+    }
+
+    bool SocketCan::isConnected()
+    {
+        return connected_;
     }
 
     bool SocketCan::send(const CanFrame &can_frame_to_sent)
@@ -104,7 +110,7 @@ namespace can_interface_lib
             return false;
         }
         can_frame_to_receive.id = CanId(socket_can_frame.can_id);
-        can_frame_to_receive.bytes_used = CanBytesUsed(socket_can_frame.can_dlc);
+        can_frame_to_receive.bytes_used = BytesUsed(socket_can_frame.can_dlc);
         std::copy(std::begin(socket_can_frame.data), std::end(socket_can_frame.data), can_frame_to_receive.data.begin());
 
         return true;

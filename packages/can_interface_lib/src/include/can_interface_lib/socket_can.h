@@ -12,6 +12,7 @@ namespace can_interface_lib
     public:
         bool connect(const std::string &interface_name) override;
         bool disconnect() override;
+        bool isConnected() override;
         bool send(const CanFrame &can_frame) override;
         bool filter(CanId can_id, CanMask can_mask) override;
         bool receive(CanFrame &can_frame) override;
