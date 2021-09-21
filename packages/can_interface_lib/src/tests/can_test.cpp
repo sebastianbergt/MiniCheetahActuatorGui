@@ -26,12 +26,12 @@ extern "C"
     ssize_t write(int fd, const void *can_frame, size_t len)
     {
         return c_mock_linux_socket.write(fd, can_frame, len);
-    };
+    }
 
     ssize_t read(int fd, void *can_frame, size_t len)
     {
         return c_mock_linux_socket.read(fd, can_frame, len);
-    };
+    }
 
     int close(int fd)
     {
@@ -46,7 +46,7 @@ extern "C"
         va_end(var_arg_list);
         return c_mock_linux_ioctl.ioctl(fd, request, interface_index_pointer);
     }
-};
+}
 
 using trompeloeil::_;
 using trompeloeil::eq;

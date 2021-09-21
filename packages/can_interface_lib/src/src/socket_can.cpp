@@ -30,7 +30,9 @@ namespace can_interface_lib
             return false;
         }
         // bind socket
-        const sockaddr_can socketcan_config{.can_family = AF_CAN, .can_ifindex = interface_index.ifr_ifindex};
+        sockaddr_can socketcan_config{};
+        socketcan_config.can_family = AF_CAN;
+        socketcan_config.can_ifindex = interface_index.ifr_ifindex;
         result = bind(socket_, reinterpret_cast<const sockaddr *>(&socketcan_config), sizeof(socketcan_config));
         if (result < 0)
         {
@@ -67,9 +69,9 @@ namespace can_interface_lib
             return false;
         }
 
-        can_frame socket_can_frame{
-            .can_id = can_frame_to_sent.id.get(),
-            .can_dlc = can_frame_to_sent.bytes_used.get()};
+        can_frame socket_can_frame{};
+        socket_can_frame.can_id = can_frame_to_sent.id.get();
+        socket_can_frame.can_dlc = can_frame_to_sent.bytes_used.get();
         std::copy(can_frame_to_sent.data.cbegin(), can_frame_to_sent.data.cend(), std::begin(socket_can_frame.data));
 
         auto bytes_sent = write(socket_, &socket_can_frame, sizeof(can_frame));

@@ -31,8 +31,9 @@ class CanInterfaceLibConan(ConanFile):
     def build(self):
         cmake = CMake(self)
         cmake.definitions["WITH_TESTS"] = self.options.with_tests
+        cmake.definitions["CONAN_CXX_FLAGS"] = "-Wall -Wextra -Wpedantic -Werror "
         if self.options.with_coverage:
-            cmake.definitions["CONAN_CXX_FLAGS"] = "--coverage -g -O0"
+            cmake.definitions["CONAN_CXX_FLAGS"] += "--coverage -g -O0 "
         cmake.configure(source_folder="src")
         cmake.build()
         if self.options.with_tests:
