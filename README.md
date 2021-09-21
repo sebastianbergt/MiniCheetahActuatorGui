@@ -13,6 +13,7 @@ Currently you need to build the packages individually.
 ```
 conan create packages/strong_types_lib/ -b missing
 conan create packages/can_interface_lib/ -b missing
+conan create packages/mini_cheetah_actuator_lib/ -b missing
 ```
 
 # Checking coverage
@@ -32,9 +33,9 @@ conan create packages/can_interface_lib/ -b -pr ./conan/profiles/coverage
 
 ## Todos
 * Complete the socket can library -> done
-* Create the actuator lib
+* Create the actuator lib -> wip
 * Enable clang tidy
-* Enable all warnings
+* Enable all warnings -> done
 * Create imgui application
 
 ## Similar Projects and information
