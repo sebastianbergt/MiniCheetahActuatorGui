@@ -33,6 +33,8 @@ conan create packages/can_interface_lib/ -b -pr ./conan/profiles/coverage
 ## Todos
 * Complete the socket can library -> done
 * Create the actuator lib
+* Enable clang tidy
+* Enable all warnings
 * Create imgui application
 
 ## Similar Projects and information
