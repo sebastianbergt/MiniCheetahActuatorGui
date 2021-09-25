@@ -6,9 +6,11 @@ namespace mini_cheetah_actuator_lib
 {
     std::uint32_t toInt(float x, float x_min, float x_max, std::uint32_t bits)
     {
-        const auto span = x_max - x_min;
-        const auto x_clamped = std::min(x_max, std::max(x, x_min));
-        const auto x_delta = x_clamped - x_min;
+        const auto x_min_clamped = std::max(0.0F, x_min);
+        const auto span = std::max(0.0F, x_max) - x_min_clamped;
+        const auto x_clamped{std::min(std::max(std::max(0.0F, x), x_min), x_max)};
+
+        const auto x_delta = x_clamped - x_min_clamped;
 
         const std::uint32_t maximum_int_value = (1 << bits) - 1;
         const float value_of_lsb = maximum_int_value / span;
@@ -21,7 +23,7 @@ namespace mini_cheetah_actuator_lib
         const auto span = x_max - x_min;
 
         const std::uint32_t maximum_int_value = (1 << bits) - 1;
-        const float value_of_lsb = maximum_int_value / span;
+        const float value_of_lsb = span / maximum_int_value;
 
         return x * value_of_lsb + x_min;
     }
