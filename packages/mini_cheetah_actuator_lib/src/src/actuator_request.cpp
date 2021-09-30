@@ -6,11 +6,10 @@ namespace mini_cheetah_actuator_lib
 {
     std::uint32_t toInt(float x, float x_min, float x_max, std::uint32_t bits)
     {
-        const auto x_min_clamped = std::max(0.0F, x_min);
-        const auto span = std::max(0.0F, x_max) - x_min_clamped;
-        const auto x_clamped{std::min(std::max(std::max(0.0F, x), x_min), x_max)};
+        const auto span = x_max - x_min;
+        const auto x_clamped{std::min(std::max(x, x_min), x_max)};
 
-        const auto x_delta = x_clamped - x_min_clamped;
+        const auto x_delta = x_clamped - x_min;
 
         const std::uint32_t maximum_int_value = (1 << bits) - 1;
         const float value_of_lsb = maximum_int_value / span;
@@ -23,9 +22,9 @@ namespace mini_cheetah_actuator_lib
         const auto span = x_max - x_min;
 
         const std::uint32_t maximum_int_value = (1 << bits) - 1;
-        const float value_of_lsb = span / maximum_int_value;
+        const float inverse_value_of_lsb = span / maximum_int_value;
 
-        return x * value_of_lsb + x_min;
+        return x * inverse_value_of_lsb + x_min;
     }
 
     ActuatorRequest::ActuatorRequest(std::string can_interface_name, MotorId motor_id, std::unique_ptr<can_interface_lib::ICan> can) : can_interface_name_{can_interface_name},
@@ -70,8 +69,28 @@ namespace mini_cheetah_actuator_lib
         return send_magic_number(0xFE);
     }
 
+    can_interface_lib::CanFrame ActuatorRequest::serialize(const AngleDeg position, const VelocityDegPerSecond velocity, const PositionFeedbackGain Kp, const VelocityFeedbackGain Kd, const FeedForwardCurrent tau_ff)
+    {
+        // toInt(position.get(), )
+
+        // can_interface_lib::CanFrame can_frame{};
+        // can_frame.id = can_interface_lib::CanId{motor_id_.get()};
+
+        // can_frame.data = {{
+        //     0xFF & position.get()
+        // }}
+
+        (void)position;
+        (void)velocity;
+        (void)Kp;
+        (void)Kd;
+        (void)tau_ff;
+        return {};
+    }
+
     bool ActuatorRequest::setPosition(const AngleDeg position, const VelocityDegPerSecond velocity, const PositionFeedbackGain Kp, const VelocityFeedbackGain Kd, const FeedForwardCurrent tau_ff)
     {
+        return can_->send({});
         (void)position;
         (void)velocity;
         (void)Kp;

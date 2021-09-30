@@ -29,6 +29,7 @@ class MiniCheetahActuatorLibConan(ConanFile):
         self.run("gcovr -r . --html --html-details -o coverage.html".split())
         cwd = os.getcwd()
         self.output.highlight("coverage report was created here: " + cwd + "/coverage.html")
+        self.run("google-chrome " + cwd + "/coverage.html")
 
     def build(self):
         cmake = CMake(self)

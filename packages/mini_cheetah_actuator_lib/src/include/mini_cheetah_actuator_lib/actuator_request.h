@@ -39,6 +39,7 @@ namespace mini_cheetah_actuator_lib
 
     private:
         bool send_magic_number(std::uint8_t last_byte);
+        can_interface_lib::CanFrame serialize(const AngleDeg position, const VelocityDegPerSecond velocity, const PositionFeedbackGain Kp, const VelocityFeedbackGain Kd, const FeedForwardCurrent tau_ff);
 
         std::string can_interface_name_;
         MotorId motor_id_;
