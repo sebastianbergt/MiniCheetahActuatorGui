@@ -12,7 +12,7 @@ The project is utilizing the excellent [conan package manager](https://conan.io/
 ./build.sh
 ```
 
-# Checking coverage
+## Checking coverage
 Install gcovr through pip3
 
 ```
@@ -23,7 +23,7 @@ You should then be able to run the build with the coverage profile. Watch the ou
 ```
 ./build_coverage.sh
 ```
-# Status
+## Status
 :stop_sign: Project is not usable yet
 
 ## Todos
