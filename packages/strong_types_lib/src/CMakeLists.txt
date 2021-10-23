@@ -10,7 +10,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 # lib
-add_library(strong_types_lib INTERFACE include/strong_types_lib/strong_types.h)
+add_library(strong_types_lib INTERFACE)
 target_include_directories(strong_types_lib INTERFACE include)
 
 install(TARGETS strong_types_lib)
