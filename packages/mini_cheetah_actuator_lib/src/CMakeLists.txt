@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.17)
 
 project(mini_cheetah_actuator_lib LANGUAGES CXX)
 
@@ -14,8 +14,8 @@ find_package(can_interface_lib REQUIRED)
 
 add_library(
   mini_cheetah_actuator_lib
-  include/mini_cheetah_actuator_lib/i_actuator_request.h
-  src/actuator_request.cpp)
+  include/mini_cheetah_actuator_lib/i_actuator.h
+  include/mini_cheetah_actuator_lib/actuator.h src/actuator.cpp)
 target_include_directories(mini_cheetah_actuator_lib PUBLIC include)
 target_link_libraries(mini_cheetah_actuator_lib PRIVATE can_interface_lib)
 
@@ -30,6 +30,7 @@ install(
 # tests
 if(WITH_TESTS)
   include(CTest)
+  list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
   find_package(Catch2 REQUIRED)
   find_package(trompeloeil REQUIRED)
   add_subdirectory(tests)

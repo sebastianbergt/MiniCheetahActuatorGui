@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.17)
 
 project(strong_types_lib LANGUAGES CXX)
 
@@ -23,6 +23,7 @@ install(
 # tests
 if(WITH_TESTS)
   include(CTest)
+  list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
   find_package(Catch2 REQUIRED)
   add_subdirectory(tests)
 endif()
