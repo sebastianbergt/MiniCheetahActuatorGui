@@ -8,12 +8,8 @@ The project is utilizing the excellent [conan package manager](https://conan.io/
 
 [Trompeloeil](https://github.com/rollbear/trompeloeil/) is used for mocking and [Catch2](https://github.com/catchorg/Catch2) for unit tests.
 
-Currently you need to build the packages individually.
-
 ```
-conan create packages/strong_types_lib/ -b missing
-conan create packages/can_interface_lib/ -b missing
-conan create packages/mini_cheetah_actuator_lib/ -b missing
+./build.sh
 ```
 
 # Checking coverage
@@ -23,17 +19,16 @@ Install gcovr through pip3
 pip3 install gcovr
 ```
 
-You should then be able to run the build with the coverage profile. Watch the output for a link to coverage.html
+You should then be able to run the build with the coverage profile. Watch the output for a link to coverage.html file for each package.
 ```
-conan create packages/can_interface_lib/ -b -pr ./conan/profiles/coverage
+./build_coverage.sh
 ```
-
 # Status
 :stop_sign: Project is not usable yet
 
 ## Todos
 * Complete the socket can library -> done
-* Create the actuator lib -> wip
+* Create the actuator lib -> done, not tested with a real actuator yet
 * Enable clang tidy
 * Enable all warnings -> done
 * Create imgui application

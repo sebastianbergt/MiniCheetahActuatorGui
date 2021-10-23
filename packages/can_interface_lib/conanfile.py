@@ -24,6 +24,7 @@ class CanInterfaceLibConan(ConanFile):
         self.build_requires("strong_types_lib/1.0.0")
 
     def _report_coverage(self):
+        self.run("gcovr -r .".split())
         self.run("gcovr -r . --html --html-details -o coverage.html".split())
         cwd = os.getcwd()
         self.output.highlight("coverage report was created here: " + cwd + "/coverage.html")
