@@ -7,7 +7,7 @@ class StrongTypesLibConan(ConanFile):
     version = "1.0.0"
     license = "MIT"
     author = "Sebastian Bergt sebastian@bergt.org"
-    url = "<Package recipe repository url here, for issues about the package>"
+    url = "https://github.com/sebastianbergt/MiniCheetahActuatorGui"
     description = "Tiny helper library to to enhance type safety and let the depending code be more expressive"
     topics = ("strong types", "utility", "type safety")
     settings = "os", "compiler", "build_type", "arch"

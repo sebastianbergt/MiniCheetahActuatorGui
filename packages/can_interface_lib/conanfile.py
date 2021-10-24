@@ -7,7 +7,7 @@ class CanInterfaceLibConan(ConanFile):
     version = "1.0.0"
     license = "MIT"
     author = "Sebastian Bergt sebastian@bergt.org"
-    url = "<Package recipe repository url here, for issues about the package>"
+    url = "https://github.com/sebastianbergt/MiniCheetahActuatorGui"
     description = "Helper to platform abstract CAN interface"
     topics = ("CAN", "communication")
     settings = "os", "compiler", "build_type", "arch"

@@ -7,7 +7,7 @@ class MiniCheetahActuatorLibConan(ConanFile):
     version = "1.0.0"
     license = "MIT"
     author = "Sebastian Bergt sebastian@bergt.org"
-    url = "<Package recipe repository url here, for issues about the package>"
+    url = "https://github.com/sebastianbergt/MiniCheetahActuatorGui"
     description = "Library for Motor Interaction via CAN"
     topics = ("MiniCheetahActuator", "CAN")
     settings = "os", "compiler", "build_type", "arch"
