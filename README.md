@@ -31,7 +31,7 @@ You should then be able to run the build with the coverage profile. Watch the ou
 * Create the actuator lib -> done, not tested with a real actuator yet
 * Enable clang tidy
 * Enable all warnings -> done
-* Create imgui application
+* Create imgui application -> wip, demo application running
 
 ## Similar Projects and information
 * Python class https://github.com/vyas-shubham/mini-cheetah-tmotor-python-can
