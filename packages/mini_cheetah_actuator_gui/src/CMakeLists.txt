@@ -24,11 +24,12 @@ add_executable(
 target_include_directories(mini_cheetah_actuator_gui
                            PRIVATE ${imgui_RES_DIRS}/bindings)
 
-find_package(mini_cheetah_actuator_lib REQUIRED)
+# find_package(mini_cheetah_actuator_lib REQUIRED)
+find_package(can_interface_lib REQUIRED)
 
 target_link_libraries(
-  mini_cheetah_actuator_gui
-  PRIVATE GLEW::GLEW glfw::glfw imgui::imgui
-          mini_cheetah_actuator_lib::mini_cheetah_actuator_lib)
+  mini_cheetah_actuator_gui PRIVATE GLEW::GLEW glfw::glfw imgui::imgui
+                                    can_interface_lib::can_interface_lib)
+# mini_cheetah_actuator_lib::mini_cheetah_actuator_lib)
 
 install(TARGETS mini_cheetah_actuator_gui)

@@ -5,92 +5,69 @@
 #include <imgui_impl_opengl3.h>
 #include <iostream>
 
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+#include <can_interface_lib/can.h>
+// #include <mini_cheetah_actuator_lib/actuator.h>
+
+#include <GLFW/glfw3.h>
+
+// namespace mca = ::mini_cheetah_actuator_lib;
+namespace cil = ::can_interface_lib;
+// constexpr std::uint8_t MOTOR_ID{0x01};
+constexpr const char *CAN_IF{"can0"};
 
 static void glfw_error_callback(int error, const char *description) {
   std::cerr << "Glfw Error " << error << ": " << description << "\n";
 }
 
-int main(int, char **) {
-  // Setup window
-  glfwSetErrorCallback(glfw_error_callback);
-  if (!glfwInit()) {
-    std::cerr << "OpenGL initialization failed.\n";
-    return EXIT_FAILURE;
-  }
+struct Context {
 
-  // GL 3.0 + GLSL 130
-  const char *glsl_version = "#version 130";
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-  // Create window with graphics context
-  GLFWwindow *window = glfwCreateWindow(
-      1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
-  if (window == NULL) {
-    std::cerr << "GLFW window creation failed.\n";
-    return EXIT_FAILURE;
-  }
-  glfwMakeContextCurrent(window);
-  glfwSwapInterval(1); // Enable vsync
-
-  // Setup Dear ImGui context
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
-  (void)io;
-
-  // Setup Dear ImGui style
-  ImGui::StyleColorsDark();
-
-  // Setup Platform/Renderer backends
-  ImGui_ImplGlfw_InitForOpenGL(window, true);
-  ImGui_ImplOpenGL3_Init(glsl_version);
-
-  ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-  // Main loop
-  while (!glfwWindowShouldClose(window)) {
-    glfwPollEvents();
-
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair
-    // to created a named window.
-    {
-      static float f = 0.0f;
-      static int counter = 0;
-
-      ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!"
-                                     // and append into it.
-
-      ImGui::Text("This is some useful text."); // Display some text (you can
-                                                // use a format strings too)
-      //   ImGui::Checkbox("Another Window", &show_another_window);
-
-      ImGui::SliderFloat("float", &f, 0.0f,
-                         1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-      ImGui::ColorEdit3(
-          "clear color",
-          (float *)&clear_color); // Edit 3 floats representing a color
-
-      if (ImGui::Button("Button")) // Buttons return true when clicked (most
-                                   // widgets return true when edited/activated)
-      {
-        counter++;
-      }
-      ImGui::SameLine();
-      ImGui::Text("counter = %d", counter);
-
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                  1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-      ImGui::End();
+  Context() {
+    // Setup window
+    glfwSetErrorCallback(glfw_error_callback);
+    if (!glfwInit()) {
+      std::cerr << "OpenGL initialization failed.\n";
+      exit(EXIT_FAILURE);
     }
 
-    // Rendering
+    // GL 3.0 + GLSL 130
+    const char *glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+    // Create window with graphics context
+    window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example",
+                              NULL, NULL);
+    if (window == NULL) {
+      std::cerr << "GLFW window creation failed.\n";
+      exit(EXIT_FAILURE);
+    }
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1); // Enable vsync
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+  }
+
+  ~Context() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+  }
+
+  void render() {
     ImGui::Render();
     int display_w, display_h;
     glfwGetFramebufferSize(window, &display_w, &display_h);
@@ -103,13 +80,86 @@ int main(int, char **) {
     glfwSwapBuffers(window);
   }
 
-  // Cleanup
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
+  void startImguiFrame() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+  }
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
+  bool closeRequested() { return glfwWindowShouldClose(window); }
 
+  void pollEvents() { glfwPollEvents(); }
+
+  GLFWwindow *window{};
+  ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
+};
+
+int main(int, char **) {
+  // Setup imgui
+  Context context;
+  // Setup actuator
+  auto can = cil::makeCanInterface();
+  if (!can) {
+    std::cerr << "Could not create new can interface\n";
+  }
+
+  if (!can->connect(CAN_IF)) {
+    std::cerr << "Failed to connect to " << CAN_IF << "\n";
+  }
+
+  // mca::Actuator actuator{CAN_IF, mca::MotorId{MOTOR_ID}, *can};
+
+  // if (!actuator.enable()) {
+  //   std::cerr << "Enabling Actuator (id=" << static_cast<int>(MOTOR_ID)
+  //             << ") failed on " << CAN_IF << "\n";
+  // }
+
+  // Main loop
+  while (!context.closeRequested()) {
+    context.pollEvents();
+    context.startImguiFrame();
+
+    static float position_deg{0.0F};
+    static float velocity_deg{0.0F};
+    static float position_feedback_gain{0.0F};
+    static float velocity_feedback_gain{0.0F};
+    static float feed_forward_current{0.0F};
+
+    ImGui::Begin("MiniCheetahActuatorGui");
+    ImGui::SliderFloat("Position °", &position_deg, 0.0f, 360.0f);
+    ImGui::SliderFloat("Velocity °/s", &velocity_deg, 0.0f, 1.0f);
+    ImGui::SliderFloat("Position Feedback Gain", &position_feedback_gain, 0.0f,
+                       500.0f);
+    ImGui::SliderFloat("Velocity Feedback Gain", &velocity_feedback_gain, 0.0f,
+                       5.0f);
+    ImGui::SliderFloat("Feed Forward Current", &feed_forward_current, 0.0f,
+                       18.0f);
+
+    // if (ImGui::Button("Send")) {
+    //   actuator.setPosition(mca::AngleDeg{position_deg},
+    //                        mca::VelocityDegPerSecond{velocity_deg},
+    //                        mca::PositionFeedbackGain{position_feedback_gain},
+    //                        mca::VelocityFeedbackGain{velocity_feedback_gain},
+    //                        mca::FeedForwardCurrentAmpere{feed_forward_current});
+
+    //   mca::Status status{mca::MotorId{0x00}, mca::AngleRad{0.0F},
+    //                      mca::VelocityRadPerSecond{0.0F},
+    //                      mca::CurrentAmpere{0.0F}};
+    //   if (!actuator.getStatus(status)) {
+
+    //     ImGui::Text("motor_id = %i", status.motor_id.get());
+    //     ImGui::Text("position = %.5f", status.positon.get());
+    //     ImGui::Text("velocity = %.5f", status.velocity.get());
+    //     ImGui::Text("current  = %.5f", status.current.get());
+    //   }
+    // }
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
+
+    context.render();
+  }
+
+  can->disconnect();
   return EXIT_SUCCESS;
 }

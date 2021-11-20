@@ -25,6 +25,7 @@ class MiniCheetahActuatorGuiConan(ConanFile):
         self.requires("glew/2.2.0")
         self.requires("glfw/3.3.4")
         self.requires("imgui/1.85")
+        self.requires("can_interface_lib/1.0.0")
         self.requires("mini_cheetah_actuator_lib/1.0.0")
 
     def _configure_cmake(self):
