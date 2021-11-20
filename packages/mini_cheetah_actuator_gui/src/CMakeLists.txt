@@ -7,13 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(TARGETS)
 
-# executable
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(imgui REQUIRED)
-find_package(mini_cheetah_actuator_lib REQUIRED)
 
 add_executable(
   mini_cheetah_actuator_gui
@@ -25,6 +23,9 @@ add_executable(
 
 target_include_directories(mini_cheetah_actuator_gui
                            PRIVATE ${imgui_RES_DIRS}/bindings)
+
+find_package(mini_cheetah_actuator_lib REQUIRED)
+
 target_link_libraries(
   mini_cheetah_actuator_gui
   PRIVATE GLEW::GLEW glfw::glfw imgui::imgui

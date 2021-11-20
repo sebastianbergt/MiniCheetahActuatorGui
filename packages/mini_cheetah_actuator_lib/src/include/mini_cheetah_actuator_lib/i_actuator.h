@@ -42,11 +42,6 @@ using FeedForwardCurrentAmpere =
 using CurrentAmpere = strong_types::StrongType<float, struct CurrentAmpereTag>;
 using MotorId = strong_types::StrongType<std::uint8_t, struct MotorIdTag>;
 
-class IActuator;
-
-std::unique_ptr<IActuator> makeActuator(std::string can_interface,
-                                        MotorId motor_id);
-
 struct Status {
   MotorId motor_id;
   AngleRad positon;
