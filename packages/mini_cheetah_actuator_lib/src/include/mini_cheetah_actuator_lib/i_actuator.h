@@ -11,8 +11,8 @@ constexpr float POSITION_MIN{-12.5F};
 constexpr float POSITION_MAX{12.5F};
 constexpr std::uint32_t POSITION_BITS{16U};
 
-constexpr float VELOCITY_RAD_PER_SECOND_MIN{-30.0F};
-constexpr float VELOCITY_RAD_PER_SECOND_MAX{30.0F};
+constexpr float VELOCITY_RAD_PER_SECOND_MIN{-65.0F};
+constexpr float VELOCITY_RAD_PER_SECOND_MAX{65.0F};
 constexpr std::uint32_t VELOCITY_RAD_PER_SECOND_BITS{12U};
 
 constexpr float POSITION_FEEDBACK_GAIN_MIN{0.0F};

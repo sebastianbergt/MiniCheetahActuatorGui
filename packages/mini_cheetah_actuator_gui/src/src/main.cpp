@@ -135,17 +135,21 @@ int main(int, char **) {
 
     static float position_deg{0.0F};
     static float velocity_deg{0.05F};
-    static float position_feedback_gain{0.2F};
-    static float velocity_feedback_gain{0.0F};
+    static float position_feedback_gain{20.0F};
+    static float velocity_feedback_gain{1.0F};
     static float feed_forward_current{0.0F};
 
     ImGui::Begin("MiniCheetahActuatorGui");
+
+    auto font = ImGui::GetFont();
+    font->Scale = 4.0F;
+
     ImGui::SliderFloat("Position °", &position_deg, -360.0f, 360.0f);
-    ImGui::SliderFloat("Velocity °/s", &velocity_deg, 0.0f, 0.1f);
+    ImGui::SliderFloat("Velocity °/s", &velocity_deg, -65.0f, 65.0f);
     ImGui::SliderFloat("Position Feedback Gain", &position_feedback_gain, 0.0f,
-                       3.0f);
+                       500.0f);
     ImGui::SliderFloat("Velocity Feedback Gain", &velocity_feedback_gain, 0.0f,
-                       1.0f);
+                       5.0f);
     ImGui::SliderFloat("Feed Forward Current", &feed_forward_current, 0.0f,
                        18.0f);
 
@@ -153,16 +157,16 @@ int main(int, char **) {
                               mca::VelocityRadPerSecond{0.0F},
                               mca::CurrentAmpere{0.0F}};
 
-    if (ImGui::Button("Send")) {
-      actuator.setPosition(mca::AngleDeg{position_deg},
-                           mca::VelocityDegPerSecond{velocity_deg},
-                           mca::PositionFeedbackGain{position_feedback_gain},
-                           mca::VelocityFeedbackGain{velocity_feedback_gain},
-                           mca::FeedForwardCurrentAmpere{feed_forward_current});
-      if (actuator.getStatus(status)) {
-        std::cout << "received status\n";
-      }
+    // if (ImGui::Button("Send")) {
+    actuator.setPosition(mca::AngleDeg{position_deg},
+                         mca::VelocityDegPerSecond{velocity_deg},
+                         mca::PositionFeedbackGain{position_feedback_gain},
+                         mca::VelocityFeedbackGain{velocity_feedback_gain},
+                         mca::FeedForwardCurrentAmpere{feed_forward_current});
+    if (actuator.getStatus(status)) {
+      std::cout << "received status\n";
     }
+    // }
 
     ImGui::Text("motor_id = %i", status.motor_id.get());
     ImGui::Text("position = %.5f", status.positon.get());
