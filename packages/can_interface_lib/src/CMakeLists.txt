@@ -7,14 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(TARGETS)
 
 # lib
 add_library(
   can_interface_lib
   include/can_interface_lib/can.h include/can_interface_lib/i_can.h
   include/can_interface_lib/can_frame.h include/can_interface_lib/socket_can.h
-  src/can.cpp src/socket_can.cpp)
+  src/socket_can.cpp src/can.cpp)
 target_include_directories(can_interface_lib PUBLIC include)
 
 find_package(strong_types_lib REQUIRED)

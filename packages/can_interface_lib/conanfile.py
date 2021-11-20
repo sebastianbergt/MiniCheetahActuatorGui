@@ -16,7 +16,11 @@ class CanInterfaceLibConan(ConanFile):
     exports_sources = "src/**"
 
     options = {"with_tests": [True, False], "with_coverage": [True, False]}
-    default_options = {"with_tests": True, "with_coverage": False, "catch2:with_main": True}
+    default_options = {
+        "with_tests": True,
+        "with_coverage": False,
+        "catch2:with_main": True,
+    }
 
     def build_requirements(self):
         self.build_requires("catch2/2.13.7")
@@ -27,7 +31,9 @@ class CanInterfaceLibConan(ConanFile):
         self.run("gcovr -r .".split())
         self.run("gcovr -r . --html --html-details -o coverage.html".split())
         cwd = os.getcwd()
-        self.output.highlight("coverage report was created here: " + cwd + "/coverage.html")
+        self.output.highlight(
+            "coverage report was created here: " + cwd + "/coverage.html"
+        )
 
     def build(self):
         cmake = CMake(self)
