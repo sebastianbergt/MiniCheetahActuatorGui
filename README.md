@@ -1,5 +1,7 @@
 # MiniCheetahActuatorGui
 
+![Screenshot](https://github.com/sebastianbergt/MiniCheetahActuatorGui/blob/main/images/MiniCheetahActuatorGui_v1.png?raw=true)
+
 ## Project Goal
 Create a fully tested C++14 driver lib and imgui GUI to be used with [TMotor AK60-6 and other motors using the same driver](https://store.tmotor.com/goods.php?id=1138).
 
@@ -24,14 +26,14 @@ You should then be able to run the build with the coverage profile. Watch the ou
 ./build_coverage.sh
 ```
 ## Status
-:stop_sign: Project is not usable yet
+:green_circle: Project is fully usable
 
 ## Todos
 * Complete the socket can library -> done
-* Create the actuator lib -> done, not tested with a real actuator yet
+* Create the actuator lib -> done and tested with AK60-6
 * Enable clang tidy
 * Enable all warnings -> done
-* Create imgui application -> wip, demo application running
+* Create imgui application -> done
 
 ## Similar Projects and information
 * Python class https://github.com/vyas-shubham/mini-cheetah-tmotor-python-can
