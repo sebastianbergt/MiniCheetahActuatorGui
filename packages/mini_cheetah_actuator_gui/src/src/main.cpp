@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstdint>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -34,8 +35,7 @@ struct Context {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create window with graphics context
-    window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example",
-                              NULL, NULL);
+    window = glfwCreateWindow(1280, 720, "MiniCheetahActuatorGui", NULL, NULL);
     if (window == NULL) {
       std::cerr << "GLFW window creation failed.\n";
       exit(EXIT_FAILURE);
@@ -93,6 +93,8 @@ struct Context {
   ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
 };
 
+constexpr float rad_to_deg(const float &in) { return in * (180.0F / M_PI); }
+
 int main(int, char **) {
   // Setup imgui
   Context context;
@@ -110,15 +112,6 @@ int main(int, char **) {
 
   mca::Actuator actuator{CAN_IF, mca::MotorId{MOTOR_ID}, *can};
 
-  bool success = actuator.setPosition(
-      mca::AngleDeg{0.0F}, mca::VelocityDegPerSecond{0.0F},
-      mca::PositionFeedbackGain{0.0F}, mca::VelocityFeedbackGain{0.0F},
-      mca::FeedForwardCurrentAmpere{0.0F});
-
-  if (!success) {
-    std::cerr << "set all parameters to zero failed.\n";
-    exit(EXIT_SUCCESS);
-  }
   std::cout << "Actuator::setPosition() to all zero succeeded\n";
 
   if (!actuator.enable()) {
@@ -126,6 +119,11 @@ int main(int, char **) {
               << ") failed on " << CAN_IF << "\n";
     exit(EXIT_SUCCESS);
   }
+  static mca::Status status{mca::MotorId{0x00}, mca::AngleRad{0.0F},
+                            mca::VelocityRadPerSecond{0.0F},
+                            mca::CurrentAmpere{0.0F}};
+  actuator.getStatus(status);
+
   std::cout << "Actuator::enable() succeeded\n";
 
   // Main loop
@@ -133,7 +131,8 @@ int main(int, char **) {
     context.pollEvents();
     context.startImguiFrame();
 
-    static float position_deg{0.0F};
+    static bool safety_off{true};
+    static float position_deg{rad_to_deg(status.positon.get())};
     static float velocity_deg{0.05F};
     static float position_feedback_gain{20.0F};
     static float velocity_feedback_gain{1.0F};
@@ -144,6 +143,9 @@ int main(int, char **) {
     auto font = ImGui::GetFont();
     font->Scale = 4.0F;
 
+    constexpr float VELOCITY_RAD_SAFETY_LIMIT{60};
+    ImGui::Checkbox("Disable when faster than 60 rad/s", &safety_off);
+
     ImGui::SliderFloat("Position °", &position_deg, -360.0f, 360.0f);
     ImGui::SliderFloat("Velocity °/s", &velocity_deg, -65.0f, 65.0f);
     ImGui::SliderFloat("Position Feedback Gain", &position_feedback_gain, 0.0f,
@@ -153,25 +155,31 @@ int main(int, char **) {
     ImGui::SliderFloat("Feed Forward Current", &feed_forward_current, 0.0f,
                        18.0f);
 
-    static mca::Status status{mca::MotorId{0x00}, mca::AngleRad{0.0F},
-                              mca::VelocityRadPerSecond{0.0F},
-                              mca::CurrentAmpere{0.0F}};
-
-    // if (ImGui::Button("Send")) {
     actuator.setPosition(mca::AngleDeg{position_deg},
                          mca::VelocityDegPerSecond{velocity_deg},
                          mca::PositionFeedbackGain{position_feedback_gain},
                          mca::VelocityFeedbackGain{velocity_feedback_gain},
                          mca::FeedForwardCurrentAmpere{feed_forward_current});
+
     if (actuator.getStatus(status)) {
-      std::cout << "received status\n";
+      // safety off
+      if (status.velocity.get() > VELOCITY_RAD_SAFETY_LIMIT && safety_off) {
+        if (actuator.disable()) {
+          std::cout << "Actuator disabled\n";
+        }
+      }
     }
-    // }
 
     ImGui::Text("motor_id = %i", status.motor_id.get());
     ImGui::Text("position = %.5f", status.positon.get());
     ImGui::Text("velocity = %.5f", status.velocity.get());
     ImGui::Text("current  = %.5f", status.current.get());
+
+    if (ImGui::Button("Reenable after saftey off")) {
+      if (actuator.enable()) {
+        std::cout << "Actuator enabled\n";
+      }
+    }
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
                 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

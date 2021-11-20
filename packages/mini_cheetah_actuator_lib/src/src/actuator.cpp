@@ -176,8 +176,9 @@ bool Actuator::getStatus(Status &status) {
   status.velocity = VelocityRadPerSecond{
       toFloat(velocity_int, VELOCITY_RAD_PER_SECOND_MIN,
               VELOCITY_RAD_PER_SECOND_MAX, VELOCITY_RAD_PER_SECOND_BITS)};
-  status.current = CurrentAmpere{
-      toFloat(current_int, POSITION_MIN, POSITION_MAX, POSITION_BITS)};
+  status.current = CurrentAmpere{toFloat(current_int, FEED_FORWARD_CURRENT_MIN,
+                                         FEED_FORWARD_CURRENT_MAX,
+                                         FEED_FORWARD_CURRENT_BITS)};
 
   return true;
 }
