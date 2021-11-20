@@ -23,7 +23,8 @@ class StrongTypesLibConan(ConanFile):
     }
 
     def build_requirements(self):
-        self.build_requires("catch2/2.13.7", force_host_context=True)
+        if self.options.with_tests:
+            self.build_requires("catch2/2.13.7", force_host_context=True)
 
     def _report_coverage(self):
         self.run("gcovr -r .".split())
@@ -49,3 +50,8 @@ class StrongTypesLibConan(ConanFile):
 
     def package_id(self):
         self.info.header_only()
+
+    def package_info(self):
+        self.cpp_info.names["cmake_find_package"] = self.name
+        self.cpp_info.names["cmake_find_package_multi"] = self.name
+        self.cpp_info.includedirs = ["include"]

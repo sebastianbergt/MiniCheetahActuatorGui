@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake
+from conans import CMake, ConanFile, tools
 import os
 
 
@@ -23,8 +23,9 @@ class MiniCheetahActuatorLibConan(ConanFile):
     }
 
     def build_requirements(self):
-        self.build_requires("catch2/2.13.7", force_host_context=True)
-        self.build_requires("trompeloeil/41", force_host_context=True)
+        if self.options.with_tests:
+            self.build_requires("catch2/2.13.7", force_host_context=True)
+            self.build_requires("trompeloeil/41", force_host_context=True)
 
     def requirements(self):
         self.requires("can_interface_lib/1.0.0")
@@ -51,3 +52,9 @@ class MiniCheetahActuatorLibConan(ConanFile):
             if self.options.with_coverage:
                 self._report_coverage()
         cmake.install()
+
+    def package_info(self):
+        self.cpp_info.names["cmake_find_package"] = self.name
+        self.cpp_info.names["cmake_find_package_multi"] = self.name
+        self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.includedirs = ["include"]
