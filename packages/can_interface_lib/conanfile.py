@@ -25,7 +25,9 @@ class CanInterfaceLibConan(ConanFile):
     def build_requirements(self):
         self.build_requires("catch2/2.13.7")
         self.build_requires("trompeloeil/41")
-        self.build_requires("strong_types_lib/1.0.0")
+
+    def requirements(self):
+        self.requires("strong_types_lib/1.0.0")
 
     def _report_coverage(self):
         self.run("gcovr -r .".split())

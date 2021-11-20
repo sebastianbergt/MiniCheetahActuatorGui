@@ -1,5 +1,4 @@
 from conans import ConanFile, CMake
-import os
 
 
 class MiniCheetahActuatorGuiConan(ConanFile):
@@ -8,7 +7,9 @@ class MiniCheetahActuatorGuiConan(ConanFile):
     license = "MIT"
     author = "Sebastian Bergt sebastian@bergt.org"
     url = "https://github.com/sebastianbergt/MiniCheetahActuatorGui"
-    description = "GUI application to simplify work with Actuators based on MiniCheetahActuator"
+    description = (
+        "GUI application to simplify work with Actuators based on MiniCheetahActuator"
+    )
     topics = ("motor control", "ui", "debug")
     settings = "os", "compiler", "build_type", "arch"
     generators = ["cmake", "cmake_find_package"]
